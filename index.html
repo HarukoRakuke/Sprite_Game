@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://unpkg.com/kaboom@3000/dist/kaboom.js"></script>
+    <script>
+      // Responding to gravity & jumping
+
+      // Start kaboom
+      const JUMP_FORCE = 800;
+      const SPEED = 300;
+
+      // initialize context
+      kaboom();
+
+      setBackground(210, 235, 240);
+
+      // load assets
+      loadSprite('bean', 'dog.png', {
+        // The image contains 9 frames layed out horizontally, slice it into individual frames
+
+        sliceX: 4,
+        sliceY: 4,
+        // Define animations
+        anims: {
+          idle: {
+            // Starts from frame 0, ends at frame 3
+            from: 0,
+            to: 3,
+            // Frame per second
+            speed: 4,
+            loop: true,
+          },
+          run: {
+            from: 3,
+            to: 11,
+            speed: 12,
+            loop: true,
+          },
+          jump: 12,
+        },
+      });
+
+      loadSprite('cat', 'cat.png');
+      loadSprite('cat2', 'cat2.png');
+      loadSprite('road', 'road.png');
+      loadSprite('trees', 'trees.png');
+      loadSprite('hills', 'hills.png');
+      loadSprite('clouds', 'clouds.png');
+      loadSound('meow', 'cat_crush.mp3');
+
+      const randomCats = ['cat', 'cat2'];
+
+      scene('game', () => {
+        // define gravity
+        setGravity(1300);
+
+        // add a game object to screen
+        const player = add([
+          // list of components
+          sprite('bean', { width: width() * 0.2 }),
+          pos(25, 240),
+          area(),
+          body(),
+        ]);
+
+        add([
+          sprite('trees', { width: width() }),
+          area(),
+          anchor('botleft'),
+          pos(0, height() - height() * 0.084),
+          {
+            isBackground: true, // Add a custom flag to identify background objects
+          },
+
+          z(-5),
+          scale(1.4),
+        ]);
+
+        add([
+          sprite('hills', { width: width() }),
+          area(),
+          pos(-100, height() - height() * 0.084),
+
+          {
+            isBackground: true,
+          },
+          scale(2),
+          anchor('botleft'),
+          z(-6),
+        ]);
+
+        const clouds = add([
+          sprite('clouds', { width: width() }),
+          pos(-50, height()),
+          anchor('botleft'),
+          scale(1.2),
+          area(),
+          z(-7),
+          {
+            isBackground: true, // Add a custom flag to identify background objects
+          },
+        ]);
+
+        player.play('idle');
+
+        add([
+          pos(0, height()),
+          anchor('botleft'),
+          area(),
+          body({ isStatic: true }),
+          sprite('road', { width: width(), height: height() * 0.1 }),
+        ]);
+
+        onKeyDown('left', () => {
+          player.move(-SPEED, 0);
+          player.flipX = true;
+          // .play() will reset to the first frame of the anim, so we want to make sure it only runs when the current animation is not "run"
+          if (player.isGrounded() && player.curAnim() !== 'run') {
+            player.play('run');
+          }
+        });
+
+        onKeyDown('right', () => {
+          player.move(SPEED, 0);
+          player.flipX = false;
+          if (player.isGrounded() && player.curAnim() !== 'run') {
+            player.play('run');
+          }
+        });
+
+        ['left', 'right'].forEach((key) => {
+          onKeyRelease(key, () => {
+            if (
+              player.isGrounded() &&
+              !isKeyDown('left') &&
+              !isKeyDown('right')
+            ) {
+              player.play('idle');
+            }
+          });
+        });
+        function jump() {
+          if (player.isGrounded()) {
+            player.jump(JUMP_FORCE);
+            player.play('jump');
+          }
+        }
+
+        player.onGround(() => {
+          player.play('idle');
+        });
+
+        // jump when user press space
+        onKeyPress('up', jump);
+        onClick(jump);
+
+        function randomCat() {
+          let catWidth = 1;
+          const randomIndex = Math.floor(Math.random() * randomCats.length);
+          const randomSprite = randomCats[randomIndex];
+          if (randomSprite === 'cat2') {
+            catWidth = '0.165';
+          } else if (randomSprite === 'cat') {
+            catWidth = '0.13';
+          }
+          // add cat
+          add([
+            sprite(randomSprite, { width: width() * catWidth }),
+            area({ scale: 0.1 }),
+            pos(width(), height() - height() * 0.09),
+            anchor('bot'),
+            move(LEFT, SPEED),
+            offscreen({ destroy: true }),
+            'cat',
+          ]);
+          wait(rand(3, 5), randomCat);
+        }
+        randomCat();
+
+        player.onCollide('cat', () => {
+          go('lose', score);
+          play('meow');
+        });
+
+        let score = 0;
+
+        const scoreLabel = add([text(score), pos(24, 24)]);
+
+        onUpdate(() => {
+          score++;
+          scoreLabel.text = score;
+        });
+      });
+
+      scene('lose', (score) => {
+        add([
+          sprite('bean'),
+          pos(width() / 2, height() / 2 - 64),
+          scale(2),
+          anchor('center'),
+        ]);
+
+        // display score
+        add([
+          text(score),
+          pos(width() / 2, height() / 2 + 64),
+          scale(2),
+          anchor('center'),
+        ]);
+
+        // go back to game with space is pressed
+        onKeyPress('space', () => go('game'));
+        onClick(() => go('game'));
+      });
+
+      go('game');
+    </script>
+  </body>
+</html>
