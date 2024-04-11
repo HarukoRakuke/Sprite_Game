@@ -142,7 +142,7 @@
         const player = add([
           // list of components
           sprite('bean', { width: width() * 0.2 }),
-          pos(25, 240),
+          pos(100, height() * 0.9),
           area({ scale: 0.7 }),
           anchor('bot'),
           body(),
@@ -238,6 +238,15 @@
           player.play('jump');
         });
 
+        onKeyPress('space', () => {
+          player.doubleJump();
+          player.play('jump');
+        });
+        onTouchStart(() => {
+          player.doubleJump();
+          player.play('jump');
+        });
+
         function randomCat() {
           let catWidth = 1;
           const randomIndex = Math.floor(Math.random() * randomCats.length);
@@ -281,9 +290,8 @@
 
       scene('lose', (score) => {
         add([
-          sprite('bean'),
+          sprite('bean', { width: width() * 0.5 }),
           pos(width() / 2, height() / 2 - 64),
-          scale(2),
           anchor('center'),
         ]);
 
