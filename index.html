@@ -122,7 +122,7 @@
               p.pos.x += velX * dt();
               p.pos.y += velY * dt();
               p.angle += velA * dt();
-              velX += windVelocity * dt(); // Increase velX by the wind velocity
+              velX += windVelocity * dt() * rand(1, 10); // Increase velX by the wind velocity
 
               velX *= airDrag;
               velY *= airDrag;
@@ -150,31 +150,83 @@
           z(1),
         ]);
 
-        add([
+        const trees1 = add([
           sprite('trees', { width: width() }),
           area(),
           anchor('botleft'),
-          pos(0, height() - height() * 0.084),
+          pos(-100, height() - height() * 0.084),
           {
             isBackground: true, // Add a custom flag to identify background objects
           },
-
           z(0),
           scale(1.4),
+          move(LEFT, SPEED),
         ]);
 
-        add([
+        const trees2 = add([
+          sprite('trees', { width: width() }),
+          area(),
+          anchor('botleft'),
+          pos(trees1.width - 100, height() - height() * 0.084),
+          {
+            isBackground: true, // Add a custom flag to identify background objects
+          },
+          z(0),
+          scale(1.4),
+          move(LEFT, SPEED),
+        ]);
+
+        loop(0.05, () => {
+          respawnTrees();
+        });
+
+        function respawnTrees() {
+          if (trees1.pos.x < 0 - trees1.width - 100) {
+            console.log('Ты где');
+            trees1.pos.x = -100;
+            trees2.pos.x = trees1.width - 100;
+          }
+        }
+
+        const hills = add([
           sprite('hills', { width: width() }),
           area(),
-          pos(-100, height() - height() * 0.084),
+          pos(0, height() - height() * 0.1),
 
           {
             isBackground: true,
           },
-          scale(2),
+          scale(1),
           anchor('botleft'),
           z(-1),
+          move(LEFT, 120),
         ]);
+
+        const hills2 = add([
+          sprite('hills', { width: width() }),
+          area(),
+          pos(hills.width, height() - height() * 0.1),
+
+          {
+            isBackground: true,
+          },
+          scale(1),
+          anchor('botleft'),
+          z(-1),
+          move(LEFT, 120),
+        ]);
+
+        function respawnHills() {
+          if (hills.pos.x < 0 - hills.width) {
+            console.log('Ты где');
+            hills.pos.x = 0;
+            hills2.pos.x = hills2.width;
+          }
+        }
+
+        loop(0.05, () => {
+          respawnHills();
+        });
 
         const clouds = add([
           sprite('clouds', { width: width() }),
