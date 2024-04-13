@@ -10,7 +10,7 @@ kaboom();
 setBackground(210, 235, 240);
 
 // load assets
-loadSprite('bean', '../img/dog.png', {
+loadSprite('bean', './img/dog.png', {
   // The image contains 9 frames layed out horizontally, slice it into individual frames
 
   sliceX: 4,
@@ -45,15 +45,15 @@ const DEF_SPIN = [2, 8];
 const DEF_SATURATION = 0.7;
 const DEF_LIGHTNESS = 0.6;
 
-loadSprite('cat', '../img/cat.png');
-loadSprite('cat2', '../img/cat2.png');
-loadSprite('cat3', '../img/cat3.png');
-loadSprite('road', '../img/road.png');
-loadSprite('trees', '../img/trees.png');
-loadSprite('hills', '../img/hills.png');
-loadSprite('clouds', '../img/clouds.png');
-loadSprite('leaf', '../img/heart_leaf.png');
-loadSound('meow', '../sounds/cat_crush.mp3');
+loadSprite('cat', './img/cat.png');
+loadSprite('cat2', './img/cat2.png');
+loadSprite('cat3', './img/cat3.png');
+loadSprite('road', './img/road.png');
+loadSprite('trees', './img/trees.png');
+loadSprite('hills', './img/hills.png');
+loadSprite('clouds', './img/clouds.png');
+loadSprite('leaf', './img/heart_leaf.png');
+loadSound('meow', './sounds/cat_crush.mp3');
 
 const randomCats = ['cat', 'cat2', 'cat3'];
 
