@@ -13,5 +13,4 @@
 
 ###  Кошки
 Возможно, в последствии я буду пополнять коллекцию кошек. Отрисованы с кошек моих одногруппников))
-
-![Спрайты кошек](https://github.com/HarukoRakuke/Sprite_Game/assets/145771485/6f0abaee-bfe0-4b87-b17d-7e57cbd5c8e5)
+![Спрайты кошек](https://github.com/HarukoRakuke/Sprite_Game/assets/145771485/48c5155f-6f4f-47b2-903b-ba6d93bf3c92)
