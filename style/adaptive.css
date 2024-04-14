@@ -1,0 +1,32 @@
+@media all and (min-width: 460px) {
+  .left-column {
+    background-position: right center;
+    background-size: 160%;
+  }
+}
+
+@media all and (max-width: 460px) {
+  section {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .left-column {
+    order: 2;
+    width: 100%;
+    aspect-ratio: 1.5;
+  }
+  .maintitle {
+    font-size: 15vw;
+  }
+  .score {
+    font-size: 8vw;
+  }
+  .button {
+    font-size: 10vw;
+  }
+  .cloud {
+    background-size: 250%;
+    background-position: bottom center;
+  }
+}

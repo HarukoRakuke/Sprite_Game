@@ -30,6 +30,11 @@ section {
   background-repeat: no-repeat;
   background-size: contain;
   background-image: url('../img/kilya.svg');
+  background-position: center;
+}
+
+.left-column:active {
+  background-image: url('../img/kilya_hover.svg');
 }
 
 .right-column {
@@ -48,7 +53,7 @@ section {
   text-align: center;
   width: 100%;
   letter-spacing: 0.3vw;
-  font-size: 6vw;
+  font-size: clamp(40px, 6vw, 6vw);
   display: block;
   -webkit-text-stroke-color: black;
   -webkit-text-stroke-width: 0.1vw;
@@ -56,7 +61,7 @@ section {
   filter: url(#goo);
   letter-spacing: 0.5vw;
   text-shadow: 0 0.5vw black;
-  margin-bottom: 5vw;
+  margin-bottom: 2em;
   transition: all 0.2s ease-in-out;
 }
 .maintitle:hover {
@@ -101,13 +106,14 @@ svg {
   position: relative;
   background-color: #fcfbf7;
   display: block;
-  padding: 50px;
+  padding: 0.5em;
   font-size: 4vw;
   z-index: 1;
   border-radius: 2vw;
   border: 0.2vw solid black;
   text-align: center;
   transition: all 0.2s ease-in-out;
+  text-wrap: nowrap;
 }
 .button:hover {
   transition: all 0.2s ease-in-out;
@@ -143,7 +149,7 @@ svg {
   filter: url(#goo);
   color: white;
   font-family: 'Russo', Arial, sans-serif;
-  font-size: 4vw;
+  font-size: clamp(30px, 4vw, 4vw);
 }
 @keyframes wind {
   100% {
@@ -161,8 +167,9 @@ svg {
   height: 100%;
   z-index: -100;
   background-image: url('../img/cloud.svg');
-  background-size: contain;
+  background-size: 200%;
   background-repeat: no-repeat;
+  background-position: bottom right;
   position: absolute;
   top: 0;
   left: 0;

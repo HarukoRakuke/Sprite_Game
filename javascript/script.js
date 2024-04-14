@@ -134,6 +134,15 @@ scene('game', () => {
   ]);
   player.pos.x = player.width;
 
+  let road = add([
+    pos(0, height()),
+    anchor('botleft'),
+    area(),
+    body({ isStatic: true }),
+    sprite('road', { width: width(), height: height() * 0.1 }),
+    z(1),
+  ]);
+
   const trees1 = add([
     sprite('trees', { width: width() }),
     area(),
@@ -226,27 +235,25 @@ scene('game', () => {
 
   player.play('run');
 
-  add([
-    pos(0, height()),
-    anchor('botleft'),
-    area(),
-    body({ isStatic: true }),
-    sprite('road', { width: width(), height: height() * 0.1 }),
-    z(1),
-  ]);
-
   player.onGround(() => {
     player.play('run');
   });
 
   // jump when user press space
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'ArrowUp') {
+    if (event.key === 'ArrowUp' || event.key === ' ') {
       event.preventDefault;
       player.doubleJump();
       player.play('jump');
       console.log('Jump key pressed');
     }
+  });
+
+  document.addEventListener('click', (event) => {
+    event.preventDefault;
+    player.doubleJump();
+    player.play('jump');
+    console.log('Jump key pressed');
   });
 
   document.addEventListener('touchstart', (event) => {
@@ -266,10 +273,10 @@ scene('game', () => {
       catWidth = '0.1';
     }
     // add cat
-    add([
+    let cat = add([
       sprite(randomSprite, { width: width() * catWidth }),
       area({ scale: 0.2 }),
-      pos(width(), height() - height() * 0.09),
+      pos(width(), height() - road.height),
       anchor('bot'),
       move(LEFT, SPEED),
       offscreen({ destroy: true }),
