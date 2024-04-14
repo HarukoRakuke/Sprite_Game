@@ -7,7 +7,43 @@
     <link rel="stylesheet" href="style/style.css" />
   </head>
   <body>
-    <p class="p">Прогулка с Килей</p>
+    <section class="menu">
+      <div class="cloud"></div>
+      <div class="leaves">
+        <div class="leaf"></div>
+        <div class="leaf"></div>
+        <div class="leaf"></div>
+        <div class="leaf"></div>
+      </div>
+      <div class="left-column"></div>
+      <div class="right-column">
+        <svg width="0" height="0">
+          <defs>
+            <filter id="goo">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" />
+              <feColorMatrix
+                mode="matrix"
+                values="-50 0 0 0   0
+                                          0 -50 0 0   0
+                                          0 0 -50  0  0
+                                          0 0 0 50  -1"
+              />
+              <feBlend in="SourceGraphic" />
+            </filter>
+          </defs>
+        </svg>
+        <div>
+          <div class="maintitle">ПРОГУЛКА <br />С КИЛЕЙ</div>
+        </div>
+        <div class="score">ОЧКОВ:<span class="score-number"></span></div>
+        <div class="button">
+          <div class="new-game">НАЧАТЬ ИГРАТЬ</div>
+        </div>
+      </div>
+    </section>
+    <div class="game-container">
+      <span class="score-increase"></span>
+    </div>
     <script src="https://unpkg.com/kaboom@3000/dist/kaboom.js"></script>
     <script src="javascript/script.js"></script>
   </body>

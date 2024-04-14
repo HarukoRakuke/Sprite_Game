@@ -1,13 +1,15 @@
-// Responding to gravity & jumping
+function getRandomArbitrary(min, max) {
+  return Math.random() * (max - min) + min;
+}
 
 // Start kaboom
 const JUMP_FORCE = 1500;
 const SPEED = 320;
 
 // initialize context
-kaboom();
-
-setBackground(210, 235, 240);
+kaboom({
+  root: document.getElementById('game-container'),
+});
 
 // load assets
 loadSprite('bean', './img/dog.png', {
@@ -35,15 +37,15 @@ loadSprite('bean', './img/dog.png', {
   },
 });
 
-const DEF_COUNT = 1;
-const DEF_GRAVITY = 800;
-const DEF_AIR_DRAG = 0.9;
-const DEF_VELOCITY = [4000, 1000];
-const DEF_ANGULAR_VELOCITY = [-200, 200];
-const DEF_SPREAD = 60;
-const DEF_SPIN = [2, 8];
-const DEF_SATURATION = 0.7;
-const DEF_LIGHTNESS = 0.6;
+let DEF_COUNT = 1;
+let DEF_GRAVITY = 800;
+let DEF_AIR_DRAG = 0.9;
+let DEF_VELOCITY = [4000, 1000];
+let DEF_ANGULAR_VELOCITY = [-200, 200];
+let DEF_SPREAD = 60;
+let DEF_SPIN = [2, 8];
+let DEF_SATURATION = 0.7;
+let DEF_LIGHTNESS = 0.6;
 
 loadSprite('cat', './img/cat.png');
 loadSprite('cat2', './img/cat2.png');
@@ -54,64 +56,68 @@ loadSprite('hills', './img/hills.png');
 loadSprite('clouds', './img/clouds.png');
 loadSprite('leaf', './img/heart_leaf.png');
 loadSound('meow', './sounds/cat_crush.mp3');
+loadSound('music', '../sounds/birb.mp3');
+
+const music = play('music', { loop: true });
+music.volume = 0.2;
 
 const randomCats = ['cat', 'cat2', 'cat3'];
 
+function addConfetti(opt = {}) {
+  const sample = (s) => (typeof s === 'function' ? s() : s);
+  for (let i = 0; i < (opt.count ?? DEF_COUNT); i++) {
+    const p = add([
+      pos(
+        sample(
+          opt.pos ??
+            vec2(rand(0, width()), rand(height() - height() * 1.2, height()))
+        )
+      ),
+      sprite('leaf'),
+      opacity(1),
+      lifespan(10),
+
+      z(rand(-2, 3)),
+      anchor('center'),
+      rotate(rand(0, 360)),
+    ]);
+    const windVelocity = -500; // Adjust the wind velocity as needed
+
+    const spin = rand(DEF_SPIN[0], DEF_SPIN[1]);
+    const gravity = opt.gravity ?? DEF_GRAVITY;
+    const airDrag = opt.airDrag ?? DEF_AIR_DRAG;
+    const heading = sample(opt.heading ?? 0) - 90;
+    const spread = opt.spread ?? DEF_SPREAD;
+    const head = heading + rand(-spread / 2, spread / 2);
+    const vel = sample(opt.velocity ?? rand(DEF_VELOCITY[0], DEF_VELOCITY[1]));
+    let velX = 0;
+    let velY = 0;
+    const velA = sample(
+      opt.angularVelocity ??
+        rand(DEF_ANGULAR_VELOCITY[0], DEF_ANGULAR_VELOCITY[1])
+    );
+    p.scale = opt.scale ?? DEF_SCALE;
+    p.onUpdate(() => {
+      // Apply wind effect (moving to the left)
+      velY += gravity * dt();
+      p.pos.x += velX * dt();
+      p.pos.y += velY * dt();
+      p.angle += velA * dt();
+      velX += windVelocity * dt() * rand(1, 10); // Increase velX by the wind velocity
+
+      velX *= airDrag;
+      velY *= airDrag;
+      p.scale.x = wave(-width() * 0.0005, width() * 0.0005, time() * spin);
+    });
+  }
+}
+
 scene('game', () => {
   // define gravity
-  removeText();
+  removeMenu();
+  setBackground(210, 235, 240);
   setGravity(1300);
-
-  function addConfetti(opt = {}) {
-    const sample = (s) => (typeof s === 'function' ? s() : s);
-    for (let i = 0; i < (opt.count ?? DEF_COUNT); i++) {
-      const p = add([
-        pos(
-          sample(
-            opt.pos ??
-              vec2(rand(0, width()), rand(height() - height() * 1.2, height()))
-          )
-        ),
-        sprite('leaf'),
-        opacity(1),
-        lifespan(10),
-        scale(width() * 0.0005),
-        z(rand(-2, 3)),
-        anchor('center'),
-        rotate(rand(0, 360)),
-      ]);
-      const windVelocity = -500; // Adjust the wind velocity as needed
-
-      const spin = rand(DEF_SPIN[0], DEF_SPIN[1]);
-      const gravity = opt.gravity ?? DEF_GRAVITY;
-      const airDrag = opt.airDrag ?? DEF_AIR_DRAG;
-      const heading = sample(opt.heading ?? 0) - 90;
-      const spread = opt.spread ?? DEF_SPREAD;
-      const head = heading + rand(-spread / 2, spread / 2);
-      const vel = sample(
-        opt.velocity ?? rand(DEF_VELOCITY[0], DEF_VELOCITY[1])
-      );
-      let velX = 0;
-      let velY = 0;
-      const velA = sample(
-        opt.angularVelocity ??
-          rand(DEF_ANGULAR_VELOCITY[0], DEF_ANGULAR_VELOCITY[1])
-      );
-      p.onUpdate(() => {
-        // Apply wind effect (moving to the left)
-        velY += gravity * dt();
-        p.pos.x += velX * dt();
-        p.pos.y += velY * dt();
-        p.angle += velA * dt();
-        velX += windVelocity * dt() * rand(1, 10); // Increase velX by the wind velocity
-
-        velX *= airDrag;
-        velY *= airDrag;
-        p.scale.x = wave(-width() * 0.0005, width() * 0.0005, time() * spin);
-      });
-    }
-  }
-
+  DEF_SCALE = width() * 0.00005;
   loop(0.1, () => {
     addConfetti();
   });
@@ -119,13 +125,14 @@ scene('game', () => {
   const player = add([
     // list of components
     sprite('bean', { width: width() * 0.2 }),
-    pos(100, height() * 0.9),
+    pos(0, height() * 0.9),
     area({ scale: 0.7 }),
     anchor('bot'),
     body(),
     doubleJump(),
     z(1),
   ]);
+  player.pos.x = player.width;
 
   const trees1 = add([
     sprite('trees', { width: width() }),
@@ -217,7 +224,7 @@ scene('game', () => {
     },
   ]);
 
-  player.play('idle');
+  player.play('run');
 
   add([
     pos(0, height()),
@@ -228,50 +235,25 @@ scene('game', () => {
     z(1),
   ]);
 
-  onKeyDown('left', () => {
-    player.move(-SPEED, 0);
-    player.flipX = true;
-    // .play() will reset to the first frame of the anim, so we want to make sure it only runs when the current animation is not "run"
-    if (player.isGrounded() && player.curAnim() !== 'run') {
-      player.play('run');
-    }
-  });
-
-  onKeyDown('right', () => {
-    player.move(SPEED, 0);
-    player.flipX = false;
-    if (player.isGrounded() && player.curAnim() !== 'run') {
-      player.play('run');
-    }
-  });
-
-  ['left', 'right'].forEach((key) => {
-    onKeyRelease(key, () => {
-      if (player.isGrounded() && !isKeyDown('left') && !isKeyDown('right')) {
-        player.play('idle');
-      }
-    });
-  });
-
   player.onGround(() => {
-    player.play('idle');
+    player.play('run');
   });
 
   // jump when user press space
-  onKeyPress('up', () => {
-    player.doubleJump();
-    player.play('jump');
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowUp') {
+      event.preventDefault;
+      player.doubleJump();
+      player.play('jump');
+      console.log('Jump key pressed');
+    }
   });
 
-  onKeyPress('space', () => {
+  document.addEventListener('touchstart', (event) => {
     player.doubleJump();
     player.play('jump');
+    console.log('Jump key pressed');
   });
-  onTouchStart(() => {
-    player.doubleJump();
-    player.play('jump');
-  });
-
   function randomCat() {
     let catWidth = 1;
     const randomIndex = Math.floor(Math.random() * randomCats.length);
@@ -286,7 +268,7 @@ scene('game', () => {
     // add cat
     add([
       sprite(randomSprite, { width: width() * catWidth }),
-      area({ scale: 0.3 }),
+      area({ scale: 0.2 }),
       pos(width(), height() - height() * 0.09),
       anchor('bot'),
       move(LEFT, SPEED),
@@ -305,38 +287,68 @@ scene('game', () => {
 
   let score = 0;
 
-  const scoreLabel = add([text(score), pos(24, 24)]);
-
   onUpdate(() => {
     score++;
-    scoreLabel.text = score;
+    let scoreIncrease = document.querySelector('.score-increase');
+    scoreIncrease.style.display = 'block';
+    scoreIncrease.innerHTML = score;
   });
 });
 
 scene('lose', (score) => {
-  const menuDog = add([
-    sprite('bean', { width: width() * 0.7 }),
-    pos(0 + width() / 8, height() / 2),
-    anchor('center'),
-  ]);
-
-  menuDog.frame = 12;
-
+  const music = play('music', { loop: true });
+  music.volume = 0.1;
+  let scoreIncrease = document.querySelector('.score-increase');
+  scoreIncrease.style.display = 'none';
   // display score
-  addText();
+  setBackground(210, 235, 240);
+  popMenu();
+  DEF_SCALE = width() * 0.0002;
+  loop(0.5, () => {
+    addConfetti();
+  });
   // go back to game with space is pressed
-  onKeyPress('space', () => go('game'));
-  onClick(() => go('game'));
+  let button = document.querySelector('.button');
+  button.addEventListener('click', () => {
+    console.log('click');
+    go('game');
+  });
+
+  let scoreNumber = document.querySelector('.score-number');
+
+  if (typeof score === 'undefined') {
+    scoreNumber.innerHTML = ' - ';
+  } else {
+    scoreNumber.innerHTML = ` ${score} `;
+  }
 });
 
 go('lose');
 
-function addText() {
-  let title = document.querySelector('.p');
-  title.style.display = 'block';
+function popMenu() {
+  let section = document.querySelector('.menu');
+  section.style.display = 'flex';
 }
 
-function removeText() {
-  let title = document.querySelector('.p');
-  title.style.display = 'none';
+function removeMenu() {
+  let section = document.querySelector('.menu');
+  section.style.display = 'none';
+  console.log('удалил');
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  go('lose');
+  let leaves = document.querySelectorAll('.leaf');
+  leaves.forEach((leaf) => {
+    const { width, height } = leaf.getBoundingClientRect();
+    leaf.style.top = `${getRandomArbitrary(
+      0 - height,
+      window.height() - height * 3
+    )}px`;
+
+    leaf.style.left = `${getRandomArbitrary(
+      window.width(),
+      window.width() - width
+    )}px`;
+  });
+});
