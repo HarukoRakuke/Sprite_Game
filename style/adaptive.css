@@ -21,6 +21,11 @@
   }
   .score {
     font-size: 8vw;
+    width: 100vw;
+    text-align: center;
+  }
+  .score-number {
+    font-size: 8vw;
   }
   .button {
     font-size: 10vw;
