@@ -50,6 +50,7 @@ let DEF_LIGHTNESS = 0.6;
 loadSprite('cat', './img/cat.png');
 loadSprite('cat2', './img/cat2.png');
 loadSprite('cat3', './img/cat3.png');
+loadSprite('cat4', './img/cat4.png');
 loadSprite('road', './img/road.png');
 loadSprite('trees', './img/trees.png');
 loadSprite('hills', './img/hills.png');
@@ -61,7 +62,7 @@ loadSound('music', '../sounds/birb.mp3');
 const music = play('music', { loop: true });
 music.volume = 0.2;
 
-const randomCats = ['cat', 'cat2', 'cat3'];
+const randomCats = ['cat', 'cat2', 'cat3', 'cat4'];
 
 function addConfetti(opt = {}) {
   const sample = (s) => (typeof s === 'function' ? s() : s);
@@ -271,6 +272,8 @@ scene('game', () => {
       catWidth = '0.13';
     } else if (randomSprite === 'cat3') {
       catWidth = '0.1';
+    } else if (randomSprite === 'cat4') {
+      catWidth = '0.13';
     }
     // add cat
     let cat = add([
